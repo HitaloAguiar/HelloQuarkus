@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -23,6 +24,18 @@ public class LivroResource {
         return Livro.findAll().list();
     }
 
+    @GET
+    @Path("/{id}")
+    public Livro get(@PathParam ("id") Long id) {
+
+        Livro livro = Livro.findById(id);
+
+        if (livro.isPersistent())        
+            return Livro.findById(id);
+
+        return null;
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -32,6 +45,19 @@ public class LivroResource {
         livro.persist();
 
         return livro;
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public void delete(@PathParam ("id") Long id) {
+
+        Livro livro = Livro.findById(id);
+
+        if (livro.isPersistent())
+            livro.delete();
     }
 
     @PUT
