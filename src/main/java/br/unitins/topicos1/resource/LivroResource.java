@@ -2,6 +2,7 @@ package br.unitins.topicos1.resource;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,24 +15,28 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import br.unitins.topicos1.model.Livro;
+import br.unitins.topicos1.repository.LivroRepository;
 
 @Path("/livros")
 public class LivroResource {
+
+    @Inject
+    private LivroRepository repository;
     
     @GET
     public List<Livro> getAll() {
 
-        return Livro.findAll().list();
+        return repository.findAll().list();
     }
 
     @GET
     @Path("/{id}")
     public Livro get(@PathParam ("id") Long id) {
 
-        Livro livro = Livro.findById(id);
+        Livro livro = repository.findById(id);
 
-        if (livro.isPersistent())        
-            return Livro.findById(id);
+        if (repository.isPersistent(livro))        
+            return livro;
 
         return null;
     }
@@ -42,7 +47,7 @@ public class LivroResource {
     @Transactional
     public Livro insert (Livro livro) {
 
-        livro.persist();
+        repository.persist(livro);
 
         return livro;
     }
@@ -54,10 +59,10 @@ public class LivroResource {
     @Transactional
     public void delete(@PathParam ("id") Long id) {
 
-        Livro livro = Livro.findById(id);
+        Livro livro = repository.findById(id);
 
-        if (livro.isPersistent())
-            livro.delete();
+        if (repository.isPersistent(livro))
+            repository.delete(livro);
     }
 
     @PUT
@@ -67,7 +72,7 @@ public class LivroResource {
     @Transactional
     public Livro update (@PathParam ("id") Long id, Livro livro) {
 
-        Livro entity = Livro.findById(id);
+        Livro entity = repository.findById(id);
 
         entity.setTitulo(livro.getTitulo());
 
@@ -80,5 +85,12 @@ public class LivroResource {
         entity.setNomeDoAutor(livro.getNomeDoAutor());
 
         return entity;
+    }
+
+    @GET
+    @Path("/search/{titulo}")
+    public List<Livro> searchByTitulo(@PathParam("titulo") String titulo) {
+
+        return repository.findByTitulo(titulo);
     }
 }

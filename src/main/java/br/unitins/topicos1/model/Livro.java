@@ -2,19 +2,29 @@ package br.unitins.topicos1.model;
 
 import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-public class Livro extends PanacheEntity {
+public class Livro {
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String titulo;
-    private String genero;
+
+    @Column(nullable = false, unique = true)
     private String isbn;
+
+    private String genero;
     private LocalDate dataDeLancamento;
     private String nomeDoAutor;
-
+    
     public String getTitulo() {
         return titulo;
     }
@@ -44,5 +54,11 @@ public class Livro extends PanacheEntity {
     }
     public void setNomeDoAutor(String nomeDoAutor) {
         this.nomeDoAutor = nomeDoAutor;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }    
 }
