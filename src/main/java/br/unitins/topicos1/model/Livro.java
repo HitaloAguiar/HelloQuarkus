@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Livro {
@@ -24,6 +26,10 @@ public class Livro {
     private String genero;
     private LocalDate dataDeLancamento;
     private String nomeDoAutor;
+
+    @ManyToOne
+    @JoinColumn(name = "id_editora")
+    private Editora editora;
     
     public String getTitulo() {
         return titulo;
@@ -60,5 +66,11 @@ public class Livro {
     }
     public void setId(Long id) {
         this.id = id;
-    }    
+    }
+    public Editora getEditora() {
+        return editora;
+    }
+    public void setEditora(Editora editora) {
+        this.editora = editora;
+    }
 }

@@ -1,6 +1,7 @@
 package br.unitins.topicos1.resource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -14,83 +15,105 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import br.unitins.topicos1.dto.LivroDTO;
+import br.unitins.topicos1.dto.LivroResponseDTO;
 import br.unitins.topicos1.model.Livro;
+import br.unitins.topicos1.repository.EditoraRepository;
 import br.unitins.topicos1.repository.LivroRepository;
 
 @Path("/livros")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class LivroResource {
 
     @Inject
-    private LivroRepository repository;
+    private LivroRepository livroRepository;
+
+    @Inject
+    private EditoraRepository editoraRepository;
     
     @GET
-    public List<Livro> getAll() {
+    public List<LivroResponseDTO> getAll() {
 
-        return repository.findAll().list();
+        return livroRepository.findAll().stream()
+        .map(livro -> new LivroResponseDTO(livro))
+        .collect(Collectors.toList());
     }
 
     @GET
     @Path("/{id}")
-    public Livro get(@PathParam ("id") Long id) {
+    public LivroResponseDTO get(@PathParam ("id") Long id) {
 
-        Livro livro = repository.findById(id);
+        Livro livro = livroRepository.findById(id);
 
-        if (repository.isPersistent(livro))        
-            return livro;
+        if (livroRepository.isPersistent(livro))        
+            return new LivroResponseDTO(livro);
 
         return null;
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Livro insert (Livro livro) {
+    public LivroResponseDTO insert (LivroDTO livroDto) {
 
-        repository.persist(livro);
+        Livro livro = new Livro();
 
-        return livro;
+        livro.setTitulo(livroDto.getTitulo());
+
+        livro.setIsbn(livroDto.getIsbn());
+
+        livro.setGenero(livroDto.getGenero());
+
+        livro.setDataDeLancamento(livroDto.getDataDeLancamento());
+
+        livro.setNomeDoAutor(livroDto.getNomeDoAutor());
+
+        livro.setEditora(editoraRepository.findById(livroDto.getIdeditora()));
+
+        livroRepository.persist(livro);
+
+        return new LivroResponseDTO(livro);
     }
-
+    
     @DELETE
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public void delete(@PathParam ("id") Long id) {
 
-        Livro livro = repository.findById(id);
+        Livro livro = livroRepository.findById(id);
 
-        if (repository.isPersistent(livro))
-            repository.delete(livro);
+        if (livroRepository.isPersistent(livro))
+            livroRepository.delete(livro);
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Livro update (@PathParam ("id") Long id, Livro livro) {
+    public LivroResponseDTO update (@PathParam ("id") Long id, LivroDTO livroDto) {
 
-        Livro entity = repository.findById(id);
+        Livro entity = livroRepository.findById(id);
 
-        entity.setTitulo(livro.getTitulo());
+        entity.setTitulo(livroDto.getTitulo());
 
-        entity.setGenero(livro.getGenero());
+        entity.setGenero(livroDto.getGenero());
 
-        entity.setIsbn(livro.getIsbn());
+        entity.setIsbn(livroDto.getIsbn());
 
-        entity.setDataDeLancamento(livro.getDataDeLancamento());
+        entity.setDataDeLancamento(livroDto.getDataDeLancamento());
 
-        entity.setNomeDoAutor(livro.getNomeDoAutor());
+        entity.setNomeDoAutor(livroDto.getNomeDoAutor());
 
-        return entity;
+        entity.setEditora(editoraRepository.findById(livroDto.getIdeditora()));
+
+        return new LivroResponseDTO(entity);
     }
-
+    
     @GET
     @Path("/search/{titulo}")
-    public List<Livro> searchByTitulo(@PathParam("titulo") String titulo) {
+    public List<LivroResponseDTO> searchByTitulo(@PathParam("titulo") String titulo) {
 
-        return repository.findByTitulo(titulo);
+        return livroRepository.findByTitulo(titulo).stream()
+        .map(livro -> new LivroResponseDTO(livro))
+        .collect(Collectors.toList());
     }
 }
