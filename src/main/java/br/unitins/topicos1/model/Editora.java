@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Editora {
@@ -14,9 +16,12 @@ public class Editora {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "O nome deve ser informado")    
     private String nome;
 
     @Column(nullable = false, unique = true)
+    @NotBlank
+    @Size(min = 14, max = 18, message = "O CNPJ precisa conter no mínimo 14 dígitos, considerando apenas números, e no máximo 18, se considerar os sinais de pontuação")
     private String cnpj;
 
     public Long getId() {

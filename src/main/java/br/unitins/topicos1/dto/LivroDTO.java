@@ -2,12 +2,25 @@ package br.unitins.topicos1.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
+
 public class LivroDTO {
     
+    @NotBlank(message = "O titulo deve ser informado")
     private String titulo;
+
+    @NotBlank
+    @Size(min = 13, message = "A ISBN precisa conter 13 dígitos, considerando apenas números")
     private String isbn;
+
     private String genero;
+
+    @PastOrPresent(message = "A data precisa estar no passado, não é possível que a data de lançamento esteja no futuro")
     private LocalDate dataDeLancamento;
+
+    @NotBlank
     private String nomeDoAutor;
     private Long ideditora;
 

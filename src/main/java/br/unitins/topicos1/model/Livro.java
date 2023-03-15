@@ -25,6 +25,8 @@ public class Livro {
 
     private String genero;
     private LocalDate dataDeLancamento;
+
+    @Column(nullable = false)
     private String nomeDoAutor;
 
     @ManyToOne

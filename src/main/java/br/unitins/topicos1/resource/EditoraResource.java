@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,7 +19,7 @@ import br.unitins.topicos1.repository.EditoraRepository;
 public class EditoraResource {
     
     @Inject
-    private EditoraRepository editoraRepository;
+    EditoraRepository editoraRepository;
 
     @GET
     public List<Editora> getAll() {
@@ -40,7 +41,7 @@ public class EditoraResource {
 
     @POST
     @Transactional    
-    public Editora insert (Editora editora) {
+    public Editora insert (@Valid Editora editora) {
 
         editoraRepository.persist(editora);
 
@@ -61,7 +62,7 @@ public class EditoraResource {
     @PUT
     @Path("/{id}")
     @Transactional
-    public Editora update (@PathParam ("id") Long id, Editora editora) {
+    public Editora update (@PathParam ("id") Long id, @Valid Editora editora) {
 
         Editora entity = editoraRepository.findById(id);
 
