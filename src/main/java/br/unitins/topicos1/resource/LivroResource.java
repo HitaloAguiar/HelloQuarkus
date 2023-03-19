@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import br.unitins.topicos1.application.Result;
 import br.unitins.topicos1.dto.LivroDTO;
 import br.unitins.topicos1.dto.LivroResponseDTO;
 import br.unitins.topicos1.service.LivroService;
@@ -43,12 +44,21 @@ public class LivroResource {
 
     @POST
     @Transactional
-    public Response insert (@Valid LivroDTO livroDto) {
+    public Response insert (LivroDTO livroDto) {
 
-        return Response
+        try {
+
+            return Response
                     .status(201)
                     .entity(livroService.insert(livroDto))
                     .build();
+        } catch (ConstraintViolationException e) {
+
+            return Response
+                    .status(404)
+                    .entity(new Result(e.getConstraintViolations()))
+                    .build();
+        }
     }
     
     @DELETE
@@ -62,13 +72,22 @@ public class LivroResource {
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response update (@PathParam ("id") Long id, @Valid LivroDTO livroDto) {
+    public Response update (@PathParam ("id") Long id, LivroDTO livroDto) {
 
-        livroService.update(id, livroDto);
+        try {
 
-        return Response
+            livroService.update(id, livroDto);
+
+            return Response
                     .status(204)
                     .build();
+        } catch (ConstraintViolationException e) {
+
+            return Response
+                    .status(404)
+                    .entity(new Result(e.getConstraintViolations()))
+                    .build();
+        }
     }
     
     @GET
